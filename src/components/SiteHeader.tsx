@@ -87,13 +87,6 @@ export function SiteHeader() {
               <LogOut className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">{t("nav.signout")}</span>
             </button>
-          ) : isAnon ? (
-            <Link
-              to="/auth"
-              className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground shadow-[0_0_20px_rgba(0,255,102,0.45)] transition-transform hover:scale-[1.03]"
-            >
-              {locale === "th" ? "บันทึกบัญชี" : "Save account"}
-            </Link>
           ) : (
             <Link
               to="/dashboard"
