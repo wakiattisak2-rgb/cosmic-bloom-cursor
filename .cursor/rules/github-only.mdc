@@ -1,0 +1,14 @@
+---
+description: GitHub + Supabase only — never suggest Lovable
+alwaysApply: true
+---
+
+# Project workflow
+
+This project is **not** on Lovable. Do not mention Lovable, Lovable sync, or Lovable deploy.
+
+- Git remote: `https://github.com/wakiattisak2-rgb/cosmic-bloom-cursor.git`
+- Supabase project: `dyqgnbjphdvhpnkclyyh`
+- Local dev: `npm run dev` → http://localhost:5173
+
+Backup/sync = `git commit` + `git push origin main` only.
