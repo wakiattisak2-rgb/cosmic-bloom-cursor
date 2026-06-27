@@ -17,7 +17,7 @@ Open http://localhost:5173
 Apply SQL in `supabase/migrations/` to your Supabase project:
 
 ```bash
-npx supabase link --project-ref YOUR_REF
+npx supabase link --project-ref dyqgnbjphdvhpnkclyyh
 npx supabase db push
 ```
 
