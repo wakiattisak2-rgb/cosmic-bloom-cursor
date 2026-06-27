@@ -4,6 +4,7 @@ import {
   BadgeCheck,
   CalendarClock,
   Clock,
+  Eye,
   Globe,
   MapPin,
   MessageSquare,
@@ -17,11 +18,12 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Starfield } from "@/components/Starfield";
 import { useI18n } from "@/lib/i18n";
-import { getExpert, avatarGradient, type Expert } from "@/lib/experts";
+import { getExpertById } from "@/lib/experts-db";
+import { avatarGradient, type Expert } from "@/lib/experts";
 
 export const Route = createFileRoute("/_authenticated/experts/$id")({
-  loader: ({ params }) => {
-    const expert = getExpert(params.id);
+  loader: async ({ params }) => {
+    const expert = await getExpertById(params.id);
     if (!expert) throw notFound();
     return { expert };
   },
@@ -144,9 +146,14 @@ function ExpertProfilePage() {
               </div>
             </div>
             <div className="col-start-2 row-start-1 flex shrink-0 flex-col items-end gap-2 md:col-auto md:row-auto md:items-end">
-              <button className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_0_24px_rgba(0,255,102,0.45)] transition-transform hover:scale-[1.03]">
-                {isTH ? "ติดต่อจ้างงาน" : "Hire now"}
-              </button>
+              <Link
+                to="/experts/$id/lens"
+                params={{ id: expert.id }}
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_0_24px_rgba(0,255,102,0.45)] transition-transform hover:scale-[1.03]"
+              >
+                <Eye className="h-4 w-4" />
+                {isTH ? "Ask Lens" : "Ask Lens"}
+              </Link>
               <button className="rounded-full border border-border px-4 py-2 text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary">
                 {isTH ? "ส่งข้อความ" : "Message"}
               </button>

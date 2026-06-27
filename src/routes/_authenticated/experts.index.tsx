@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   BadgeCheck,
   Search,
@@ -13,7 +14,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Starfield } from "@/components/Starfield";
 import { useI18n } from "@/lib/i18n";
-import { EXPERTS, avatarGradient, type Specialty } from "@/lib/experts";
+import { listExperts } from "@/lib/experts-db";
+import { avatarGradient, type Specialty } from "@/lib/experts";
 
 export const Route = createFileRoute("/_authenticated/experts/")({
   head: () => ({ meta: [{ title: "Expert Directory — Aetros" }] }),
@@ -36,9 +38,12 @@ function ExpertsPage() {
   const [filter, setFilter] = useState<"all" | Specialty>("all");
   const [q, setQ] = useState("");
 
+  const expertsQ = useQuery({ queryKey: ["experts"], queryFn: listExperts });
+  const experts = expertsQ.data ?? [];
+
   const items = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    return EXPERTS.filter((e) => {
+    return experts.filter((e) => {
       if (filter !== "all" && !e.specialties.includes(filter)) return false;
       if (!needle) return true;
       const hay = [
@@ -54,7 +59,27 @@ function ExpertsPage() {
         .toLowerCase();
       return hay.includes(needle);
     });
-  }, [filter, q]);
+  }, [experts, filter, q]);
+
+  const stats = useMemo(() => {
+    if (!experts.length) {
+      return {
+        count: 0,
+        certs: "—",
+        projects: 0,
+        rating: "—",
+      };
+    }
+    const avg = experts.reduce((s, e) => s + e.rating, 0) / experts.length;
+    const projects = experts.reduce((s, e) => s + e.projects, 0);
+    const certSet = new Set(experts.flatMap((e) => e.certs.filter((c) => !c.startsWith("★"))));
+    return {
+      count: experts.length,
+      certs: certSet.size ? [...certSet].slice(0, 3).join(" · ") : "—",
+      projects,
+      rating: avg.toFixed(1),
+    };
+  }, [experts]);
 
   return (
     <div className="relative min-h-screen">
@@ -90,9 +115,12 @@ function ExpertsPage() {
                   : "Consultants verified via global certifications (GRI, SBTi, CDP, TCFD) and peer reviews from the Aetros community."}
               </p>
             </div>
-            <button className="self-start rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_0_24px_rgba(0,255,102,0.45)] transition-transform hover:scale-[1.03] md:self-end">
+            <Link
+              to="/experts/apply"
+              className="self-start rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-[0_0_24px_rgba(0,255,102,0.45)] transition-transform hover:scale-[1.03] md:self-end"
+            >
               {isTH ? "เป็น Expert" : "Become an Expert"}
-            </button>
+            </Link>
           </div>
 
           <div className="relative mt-8 flex flex-col gap-4">
@@ -134,10 +162,10 @@ function ExpertsPage() {
         {/* Stats strip */}
         <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            { l: isTH ? "Expert ที่ verified" : "Verified Experts", v: "120+" },
-            { l: isTH ? "Certifications" : "Certifications", v: "GRI · SBTi · TCFD" },
-            { l: isTH ? "โครงการสำเร็จ" : "Projects Delivered", v: "850+" },
-            { l: isTH ? "คะแนนเฉลี่ย" : "Average Rating", v: "4.9 / 5" },
+            { l: isTH ? "Expert ที่ verified" : "Verified Experts", v: stats.count.toString() },
+            { l: isTH ? "Certifications" : "Certifications", v: stats.certs },
+            { l: isTH ? "โครงการสำเร็จ" : "Projects Delivered", v: stats.projects.toLocaleString() },
+            { l: isTH ? "คะแนนเฉลี่ย" : "Average Rating", v: stats.rating === "—" ? "—" : `${stats.rating} / 5` },
           ].map((s) => (
             <div key={s.l} className="glass rounded-2xl px-4 py-3">
               <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -263,9 +291,12 @@ function ExpertsPage() {
                   : "Apply as a verified expert — use your certifications to help organizations and earn Carbon Credits on every engagement."}
               </p>
             </div>
-            <button className="rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-[0_0_24px_rgba(0,255,102,0.45)] transition-transform hover:scale-[1.03]">
+            <Link
+              to="/experts/apply"
+              className="rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-[0_0_24px_rgba(0,255,102,0.45)] transition-transform hover:scale-[1.03]"
+            >
               {isTH ? "สมัครเป็น Expert" : "Apply as Expert"}
-            </button>
+            </Link>
           </div>
         </section>
       </main>

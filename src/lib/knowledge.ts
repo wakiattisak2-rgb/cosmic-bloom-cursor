@@ -40,6 +40,7 @@ export async function listArticles(): Promise<KnowledgeArticle[]> {
     .from(TABLE)
     .select("*")
     .eq("is_published", true)
+    .is("deleted_at", null)
     .order("published_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as unknown as KnowledgeArticle[];

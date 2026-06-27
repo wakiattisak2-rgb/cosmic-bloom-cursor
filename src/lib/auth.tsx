@@ -17,16 +17,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s);
     });
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (data.session) {
-        setSession(data.session);
-        setLoading(false);
-      } else {
-        // Auto sign-in as anonymous so visitors can use Dashboard instantly
-        const { data: anon, error } = await supabase.auth.signInAnonymously();
-        if (!error) setSession(anon.session);
-        setLoading(false);
-      }
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setLoading(false);
     });
     return () => sub.subscription.unsubscribe();
   }, []);

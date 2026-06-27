@@ -8,6 +8,9 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { ImpactCounter } from "@/components/ImpactCounter";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { logActivity } from "@/lib/activity";
+import { canPerformActions, memberRequiredMessage } from "@/lib/member";
+import { queueRedemptionEmail } from "@/lib/notifications";
 import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/marketplace")({
@@ -47,11 +50,22 @@ function Marketplace() {
 
   const redeem = useMutation({
     mutationFn: async (r: { id: string; title: string; cost: number }) => {
+      if (!canPerformActions(user)) throw new Error(memberRequiredMessage(locale));
       const { error } = await supabase.rpc("redeem_reward", { p_reward_id: r.id });
       if (error) throw error;
       return r;
     },
     onSuccess: (r) => {
+      void logActivity("reward_redeem", {
+        entityType: "reward",
+        entityId: r.id,
+        metadata: { cost: r.cost, title: r.title },
+      });
+      void queueRedemptionEmail(user!.id, {
+        rewardTitle: r.title,
+        cost: r.cost,
+        email: user?.email,
+      });
       setReceipt({ title: r.title, cost: r.cost });
       qc.invalidateQueries({ queryKey: ["profile"] });
     },

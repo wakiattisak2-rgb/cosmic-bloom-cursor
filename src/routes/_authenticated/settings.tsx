@@ -1,8 +1,7 @@
 import { createFileRoute, Outlet, Link } from "@tanstack/react-router";
-import { User, Activity, Shield } from "lucide-react";
+import { User, Activity, Shield, Eye, Download, Bell } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { AnonymousBanner } from "@/components/AnonymousBanner";
 import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/settings")({
@@ -14,14 +13,16 @@ function SettingsLayout() {
   const { locale } = useI18n();
   const items = [
     { to: "/settings", label: locale === "th" ? "โปรไฟล์" : "Profile", icon: User, exact: true },
+    { to: "/settings/privacy", label: locale === "th" ? "ความเป็นส่วนตัว" : "Privacy", icon: Eye },
+    { to: "/settings/notifications", label: locale === "th" ? "การแจ้งเตือน" : "Notifications", icon: Bell },
     { to: "/settings/activity", label: locale === "th" ? "ประวัติกิจกรรม" : "Activity", icon: Activity },
+    { to: "/settings/export", label: locale === "th" ? "ส่งออกข้อมูล" : "Export", icon: Download },
     { to: "/settings/account", label: locale === "th" ? "บัญชี & ความปลอดภัย" : "Account & Security", icon: Shield },
   ];
 
   return (
     <div className="min-h-screen">
       <SiteHeader />
-      <AnonymousBanner />
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
         <header className="mb-8">
           <p className="text-xs uppercase tracking-widest text-muted-foreground">Account</p>

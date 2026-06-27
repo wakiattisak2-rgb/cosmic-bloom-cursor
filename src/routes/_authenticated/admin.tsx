@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, Link, useNavigate, useLocation } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { LayoutDashboard, Users, Activity, ShieldAlert } from "lucide-react";
+import { LayoutDashboard, Users, Activity, ShieldAlert, FileText, BadgeCheck, Gift } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { useRoles } from "@/lib/roles";
@@ -32,6 +32,9 @@ function AdminLayout() {
   const items = [
     { to: "/admin", label: locale === "th" ? "ภาพรวม" : "Overview", icon: LayoutDashboard, exact: true },
     { to: "/admin/users", label: locale === "th" ? "ผู้ใช้" : "Users", icon: Users },
+    { to: "/admin/content", label: locale === "th" ? "เนื้อหา" : "Content", icon: FileText },
+    { to: "/admin/experts", label: locale === "th" ? "Experts" : "Experts", icon: BadgeCheck },
+    { to: "/admin/rewards", label: locale === "th" ? "รางวัล" : "Rewards", icon: Gift },
     { to: "/admin/activity", label: locale === "th" ? "บันทึก" : "Audit log", icon: Activity },
   ];
 

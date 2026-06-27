@@ -6,6 +6,8 @@ const STRINGS = {
   en: {
     "nav.home": "Home",
     "nav.dashboard": "Dashboard",
+    "nav.wallet": "Wallet",
+    "nav.compass": "Compass",
     "nav.community": "Community",
     "nav.market": "Marketplace",
     "nav.knowledge": "Knowledge",
@@ -30,8 +32,10 @@ const STRINGS = {
     "features.title": "An ecosystem for the curious and the committed",
     "features.community": "Global Community",
     "features.community.d": "Bilingual feed connecting beginners to ESG experts.",
-    "features.avatar": "Inner Universe Avatar",
-    "features.avatar.d": "A living visualization of your sustainability journey.",
+    "features.avatar": "Impact Constellation",
+    "features.avatar.d": "Every action becomes a star — share your universe as PNG.",
+    "features.receipt": "Impact Receipts",
+    "features.receipt.d": "Verified boarding-pass receipts for every eco action you log.",
     "features.tracker": "Carbon Tracker",
     "features.tracker.d": "Log actions, earn XP and Carbon Credits.",
     "features.market": "Impact Marketplace",
@@ -63,6 +67,7 @@ const STRINGS = {
     "dash.log_btn": "Log Action",
     "community.feed": "Feed",
     "community.challenges": "Challenges",
+    "community.squads": "Squads",
     "community.post.placeholder": "Share an ESG idea, question, or initiative…",
     "community.post.submit": "Post",
     "community.upvote": "Upvote",
@@ -106,6 +111,8 @@ const STRINGS = {
   th: {
     "nav.home": "หน้าแรก",
     "nav.dashboard": "แดชบอร์ด",
+    "nav.wallet": "Wallet",
+    "nav.compass": "Compass",
     "nav.community": "ชุมชน",
     "nav.market": "ตลาดรางวัล",
     "nav.knowledge": "คลังความรู้",
@@ -130,8 +137,10 @@ const STRINGS = {
     "features.title": "ระบบนิเวศสำหรับผู้สนใจและผู้เชี่ยวชาญ",
     "features.community": "ชุมชนระดับโลก",
     "features.community.d": "ฟีดสองภาษาเชื่อมผู้เริ่มต้นเข้ากับผู้เชี่ยวชาญ",
-    "features.avatar": "อวตาร์จักรวาลภายใน",
-    "features.avatar.d": "ภาพจักรวาลที่เติบโตตามเส้นทางความยั่งยืนของคุณ",
+    "features.avatar": "กลุ่มดาว Impact",
+    "features.avatar.d": "ทุกการกระทำคือดาว — แชร์จักรวาลของคุณเป็น PNG",
+    "features.receipt": "ใบเสร็จ Impact",
+    "features.receipt.d": "ใบเสร็จยืนยันทุกการกระทำที่คุณบันทึก",
     "features.tracker": "ตัวติดตามคาร์บอน",
     "features.tracker.d": "บันทึกการกระทำ รับ XP และคาร์บอนเครดิต",
     "features.market": "ตลาดรางวัลผลกระทบ",
@@ -163,6 +172,7 @@ const STRINGS = {
     "dash.log_btn": "บันทึกการกระทำ",
     "community.feed": "ฟีด",
     "community.challenges": "ภารกิจ",
+    "community.squads": "Squads",
     "community.post.placeholder": "แชร์ไอเดียหรือคำถาม ESG ของคุณ…",
     "community.post.submit": "โพสต์",
     "community.upvote": "โหวต",
@@ -231,5 +241,6 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 export function useI18n() {
   const v = useContext(Ctx);
   if (!v) throw new Error("useI18n outside provider");
-  return v;
+  const tx = (en: string, th: string) => (v.locale === "th" ? th : en);
+  return { ...v, tx };
 }

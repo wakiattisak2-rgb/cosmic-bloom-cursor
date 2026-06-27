@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Users, Sparkles, Activity, Gift, Leaf, Trees } from "lucide-react";
+import { ArrowRight, Users, Sparkles, Activity, Gift, Leaf } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ParticleHero } from "@/components/ParticleHero";
@@ -32,12 +32,13 @@ function Landing() {
       ]);
       const credits = (agg ?? []).reduce((s, r) => s + (r.credits_awarded ?? 0), 0);
       const xp = (agg ?? []).reduce((s, r) => s + (r.xp_awarded ?? 0), 0);
-      // base + community
+      const actionCount = (agg ?? []).length;
       return {
-        carbon: 12847 + credits * 1.5,
-        trees: 482 + Math.floor(credits / 25),
-        innovators: 1240 + (users ?? 0),
         xp,
+        credits,
+        members: users ?? 0,
+        actions: actionCount,
+        showImpact: actionCount >= 10 || (users ?? 0) >= 5,
       };
     },
     refetchInterval: 12_000,
@@ -76,7 +77,7 @@ function Landing() {
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
               <Link
-                to="/auth"
+                to="/dashboard"
                 className="group inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground neon-glow transition-transform hover:scale-[1.03]"
               >
                 {t("hero.cta")}
@@ -93,26 +94,22 @@ function Landing() {
         </div>
       </section>
 
-      {/* IMPACT COUNTERS */}
+      {/* IMPACT COUNTERS — live community stats only */}
       <section className="border-y border-border/60 bg-card/40">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-px overflow-hidden rounded-none sm:grid-cols-3">
-          <ImpactCell
-            label={t("impact.carbon")}
-            value={impact.data?.carbon ?? 0}
-            decimals={0}
-            icon={<Leaf className="h-4 w-4" />}
-          />
-          <ImpactCell
-            label={t("impact.trees")}
-            value={impact.data?.trees ?? 0}
-            icon={<Trees className="h-4 w-4" />}
-          />
-          <ImpactCell
-            label={t("impact.innovators")}
-            value={impact.data?.innovators ?? 0}
-            icon={<Users className="h-4 w-4" />}
-          />
-        </div>
+        {impact.data?.showImpact ? (
+          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-px overflow-hidden sm:grid-cols-4">
+            <ImpactCell label="Total XP" value={impact.data?.xp ?? 0} icon={<Sparkles className="h-4 w-4" />} />
+            <ImpactCell label="Carbon Credits" value={impact.data?.credits ?? 0} icon={<Leaf className="h-4 w-4" />} />
+            <ImpactCell label={t("impact.innovators")} value={impact.data?.members ?? 0} icon={<Users className="h-4 w-4" />} />
+            <ImpactCell label="Eco Actions" value={impact.data?.actions ?? 0} icon={<Activity className="h-4 w-4" />} />
+          </div>
+        ) : (
+          <div className="mx-auto max-w-6xl px-4 py-10 text-center text-sm text-muted-foreground">
+            {locale === "th"
+              ? "สถิต์ชุมชนจะปรากฏเมื่อสมาชิกเริ่มบันทึกผลกระทบ — เป็นคนแรกที่ร่วมเดินทาง"
+              : "Community stats appear once members log real impact — be among the first pioneers."}
+          </div>
+        )}
       </section>
 
       {/* STORY */}
@@ -146,16 +143,36 @@ function Landing() {
             title={t("features.avatar")}
             body={t("features.avatar.d")}
             feature
+            demo={
+              <div className="mt-4 rounded-xl border border-primary/20 bg-[#050810]/80 p-3">
+                <div className="relative mx-auto h-32 w-32">
+                  {[...Array(12)].map((_, i) => (
+                    <span
+                      key={i}
+                      className="absolute h-1 w-1 rounded-full bg-primary shadow-[0_0_6px_#00FF66]"
+                      style={{
+                        left: `${20 + (i * 17) % 70}%`,
+                        top: `${15 + (i * 23) % 65}%`,
+                        opacity: 0.4 + (i % 3) * 0.2,
+                      }}
+                    />
+                  ))}
+                </div>
+                <p className="mt-2 text-center text-[10px] text-muted-foreground">
+                  {locale === "th" ? "1 action = 1 star" : "1 action = 1 star"}
+                </p>
+              </div>
+            }
+          />
+          <BentoCard
+            icon={<Activity className="h-5 w-5" />}
+            title={t("features.receipt")}
+            body={t("features.receipt.d")}
           />
           <BentoCard
             icon={<Users className="h-5 w-5" />}
             title={t("features.community")}
             body={t("features.community.d")}
-          />
-          <BentoCard
-            icon={<Activity className="h-5 w-5" />}
-            title={t("features.tracker")}
-            body={t("features.tracker.d")}
           />
           <BentoCard
             className="md:col-span-3"
@@ -188,9 +205,9 @@ function ImpactCell({
 }
 
 function BentoCard({
-  className = "", icon, title, body, feature = false,
+  className = "", icon, title, body, feature = false, demo,
 }: {
-  className?: string; icon: React.ReactNode; title: string; body: string; feature?: boolean;
+  className?: string; icon: React.ReactNode; title: string; body: string; feature?: boolean; demo?: React.ReactNode;
 }) {
   return (
     <div
@@ -208,6 +225,7 @@ function BentoCard({
         </div>
         <h3 className="mt-4 font-display text-xl font-semibold">{title}</h3>
         <p className="mt-2 text-sm text-muted-foreground">{body}</p>
+        {demo}
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
 
 export function SiteFooter() {
@@ -10,11 +11,20 @@ export function SiteFooter() {
           </span>
           <div>
             <div className="font-display text-base font-semibold">Aetros</div>
-            <div className="text-xs text-muted-foreground">
-              The Universe Begins Within You.
-            </div>
+            <div className="text-xs text-muted-foreground">The Universe Begins Within You.</div>
           </div>
         </div>
+        <nav className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+          <Link to="/legal/privacy" className="hover:text-primary">
+            Privacy
+          </Link>
+          <Link to="/legal/terms" className="hover:text-primary">
+            Terms
+          </Link>
+          <Link to="/legal/cookies" className="hover:text-primary">
+            Cookies
+          </Link>
+        </nav>
         <p className="text-xs text-muted-foreground">
           © {new Date().getFullYear()} Aetros — Built for an ESG community without borders.
         </p>

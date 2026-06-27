@@ -5,7 +5,9 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
+import { uploadAvatar } from "@/lib/avatars";
 import { logActivity } from "@/lib/activity";
+import { UserCircle } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/settings/")({
   component: ProfileSettings,
@@ -29,6 +31,8 @@ function ProfileSettings() {
   const [handle, setHandle] = useState("");
   const [bio, setBio] = useState("");
   const [country, setCountry] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (!profile.data) return;
@@ -37,7 +41,24 @@ function ProfileSettings() {
     setHandle(p.handle ?? "");
     setBio(p.bio ?? "");
     setCountry(p.country ?? "");
+    setAvatarUrl(p.avatar_url ?? null);
   }, [profile.data]);
+
+  async function onAvatar(file: File | null) {
+    if (!file || !user) return;
+    setUploading(true);
+    try {
+      const url = await uploadAvatar(user.id, file);
+      await (supabase.from as any)("profiles").update({ avatar_url: url }).eq("id", user.id);
+      setAvatarUrl(url);
+      toast.success(locale === "th" ? "อัปเดตรูปแล้ว" : "Avatar updated");
+      qc.invalidateQueries({ queryKey: ["profile", user.id] });
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   const save = useMutation({
     mutationFn: async () => {
@@ -68,6 +89,25 @@ function ProfileSettings() {
       <p className="mt-1 text-sm text-muted-foreground">
         {locale === "th" ? "ข้อมูลที่แสดงในชุมชน" : "How you appear across the community."}
       </p>
+      <div className="mt-6 flex items-center gap-4">
+        <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-full border border-border bg-muted/30">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <UserCircle className="h-10 w-10 text-muted-foreground" />
+          )}
+        </div>
+        <label className="cursor-pointer text-xs text-primary hover:underline">
+          {uploading ? "…" : locale === "th" ? "เปลี่ยนรูปโปรไฟล์" : "Change avatar"}
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            disabled={uploading}
+            onChange={(e) => onAvatar(e.target.files?.[0] ?? null)}
+          />
+        </label>
+      </div>
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <Field label={locale === "th" ? "ชื่อที่แสดง" : "Display name"} value={displayName} onChange={setDisplayName} />
         <Field label="Handle" value={handle} onChange={setHandle} placeholder="stardust" prefix="@" />

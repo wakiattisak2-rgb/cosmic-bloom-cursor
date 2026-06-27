@@ -9,29 +9,57 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as LegalRouteImport } from './routes/legal'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UHandleRouteImport } from './routes/u.$handle'
+import { Route as LegalTermsRouteImport } from './routes/legal.terms'
+import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
+import { Route as LegalCookiesRouteImport } from './routes/legal.cookies'
+import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedMarketplaceRouteImport } from './routes/_authenticated/marketplace'
 import { Route as AuthenticatedKnowledgeRouteImport } from './routes/_authenticated/knowledge'
 import { Route as AuthenticatedExpertsRouteImport } from './routes/_authenticated/experts'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCompassRouteImport } from './routes/_authenticated/compass'
 import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings.index'
 import { Route as AuthenticatedKnowledgeIndexRouteImport } from './routes/_authenticated/knowledge.index'
 import { Route as AuthenticatedExpertsIndexRouteImport } from './routes/_authenticated/experts.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedSettingsPrivacyRouteImport } from './routes/_authenticated/settings.privacy'
+import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings.notifications'
+import { Route as AuthenticatedSettingsExportRouteImport } from './routes/_authenticated/settings.export'
 import { Route as AuthenticatedSettingsActivityRouteImport } from './routes/_authenticated/settings.activity'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings.account'
 import { Route as AuthenticatedKnowledgeNewRouteImport } from './routes/_authenticated/knowledge.new'
 import { Route as AuthenticatedKnowledgeSlugRouteImport } from './routes/_authenticated/knowledge.$slug'
+import { Route as AuthenticatedExpertsLensRouteImport } from './routes/_authenticated/experts.lens'
+import { Route as AuthenticatedExpertsApplyRouteImport } from './routes/_authenticated/experts.apply'
 import { Route as AuthenticatedExpertsIdRouteImport } from './routes/_authenticated/experts.$id'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
 import { Route as AuthenticatedAdminSetupRouteImport } from './routes/_authenticated/admin.setup'
+import { Route as AuthenticatedAdminRewardsRouteImport } from './routes/_authenticated/admin.rewards'
+import { Route as AuthenticatedAdminExpertsRouteImport } from './routes/_authenticated/admin.experts'
+import { Route as AuthenticatedAdminContentRouteImport } from './routes/_authenticated/admin.content'
 import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
+import { Route as AuthenticatedExpertsIdLensRouteImport } from './routes/_authenticated/experts.$id.lens'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalRoute = LegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -46,9 +74,39 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UHandleRoute = UHandleRouteImport.update({
+  id: '/u/$handle',
+  path: '/u/$handle',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalTermsRoute = LegalTermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => LegalRoute,
+} as any)
+const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => LegalRoute,
+} as any)
+const LegalCookiesRoute = LegalCookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
+  getParentRoute: () => LegalRoute,
+} as any)
+const AuthenticatedWalletRoute = AuthenticatedWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedMarketplaceRoute =
@@ -70,6 +128,11 @@ const AuthenticatedExpertsRoute = AuthenticatedExpertsRouteImport.update({
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCompassRoute = AuthenticatedCompassRouteImport.update({
+  id: '/compass',
+  path: '/compass',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCommunityRoute = AuthenticatedCommunityRouteImport.update({
@@ -105,6 +168,24 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedSettingsPrivacyRoute =
+  AuthenticatedSettingsPrivacyRouteImport.update({
+    id: '/privacy',
+    path: '/privacy',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsNotificationsRoute =
+  AuthenticatedSettingsNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
+const AuthenticatedSettingsExportRoute =
+  AuthenticatedSettingsExportRouteImport.update({
+    id: '/export',
+    path: '/export',
+    getParentRoute: () => AuthenticatedSettingsRoute,
+  } as any)
 const AuthenticatedSettingsActivityRoute =
   AuthenticatedSettingsActivityRouteImport.update({
     id: '/activity',
@@ -129,6 +210,18 @@ const AuthenticatedKnowledgeSlugRoute =
     path: '/$slug',
     getParentRoute: () => AuthenticatedKnowledgeRoute,
   } as any)
+const AuthenticatedExpertsLensRoute =
+  AuthenticatedExpertsLensRouteImport.update({
+    id: '/lens',
+    path: '/lens',
+    getParentRoute: () => AuthenticatedExpertsRoute,
+  } as any)
+const AuthenticatedExpertsApplyRoute =
+  AuthenticatedExpertsApplyRouteImport.update({
+    id: '/apply',
+    path: '/apply',
+    getParentRoute: () => AuthenticatedExpertsRoute,
+  } as any)
 const AuthenticatedExpertsIdRoute = AuthenticatedExpertsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -144,157 +237,306 @@ const AuthenticatedAdminSetupRoute = AuthenticatedAdminSetupRouteImport.update({
   path: '/setup',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminRewardsRoute =
+  AuthenticatedAdminRewardsRouteImport.update({
+    id: '/rewards',
+    path: '/rewards',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminExpertsRoute =
+  AuthenticatedAdminExpertsRouteImport.update({
+    id: '/experts',
+    path: '/experts',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminContentRoute =
+  AuthenticatedAdminContentRouteImport.update({
+    id: '/content',
+    path: '/content',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminActivityRoute =
   AuthenticatedAdminActivityRouteImport.update({
     id: '/activity',
     path: '/activity',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedExpertsIdLensRoute =
+  AuthenticatedExpertsIdLensRouteImport.update({
+    id: '/lens',
+    path: '/lens',
+    getParentRoute: () => AuthenticatedExpertsIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/legal': typeof LegalRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/community': typeof AuthenticatedCommunityRoute
+  '/compass': typeof AuthenticatedCompassRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/experts': typeof AuthenticatedExpertsRouteWithChildren
   '/knowledge': typeof AuthenticatedKnowledgeRouteWithChildren
   '/marketplace': typeof AuthenticatedMarketplaceRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
   '/settings': typeof AuthenticatedSettingsRouteWithChildren
+  '/wallet': typeof AuthenticatedWalletRoute
+  '/legal/cookies': typeof LegalCookiesRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/terms': typeof LegalTermsRoute
+  '/u/$handle': typeof UHandleRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/admin/content': typeof AuthenticatedAdminContentRoute
+  '/admin/experts': typeof AuthenticatedAdminExpertsRoute
+  '/admin/rewards': typeof AuthenticatedAdminRewardsRoute
   '/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
-  '/experts/$id': typeof AuthenticatedExpertsIdRoute
+  '/experts/$id': typeof AuthenticatedExpertsIdRouteWithChildren
+  '/experts/apply': typeof AuthenticatedExpertsApplyRoute
+  '/experts/lens': typeof AuthenticatedExpertsLensRoute
   '/knowledge/$slug': typeof AuthenticatedKnowledgeSlugRoute
   '/knowledge/new': typeof AuthenticatedKnowledgeNewRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/activity': typeof AuthenticatedSettingsActivityRoute
+  '/settings/export': typeof AuthenticatedSettingsExportRoute
+  '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/settings/privacy': typeof AuthenticatedSettingsPrivacyRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/experts/': typeof AuthenticatedExpertsIndexRoute
   '/knowledge/': typeof AuthenticatedKnowledgeIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/experts/$id/lens': typeof AuthenticatedExpertsIdLensRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/legal': typeof LegalRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/community': typeof AuthenticatedCommunityRoute
+  '/compass': typeof AuthenticatedCompassRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/marketplace': typeof AuthenticatedMarketplaceRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/wallet': typeof AuthenticatedWalletRoute
+  '/legal/cookies': typeof LegalCookiesRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/terms': typeof LegalTermsRoute
+  '/u/$handle': typeof UHandleRoute
   '/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/admin/content': typeof AuthenticatedAdminContentRoute
+  '/admin/experts': typeof AuthenticatedAdminExpertsRoute
+  '/admin/rewards': typeof AuthenticatedAdminRewardsRoute
   '/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
-  '/experts/$id': typeof AuthenticatedExpertsIdRoute
+  '/experts/$id': typeof AuthenticatedExpertsIdRouteWithChildren
+  '/experts/apply': typeof AuthenticatedExpertsApplyRoute
+  '/experts/lens': typeof AuthenticatedExpertsLensRoute
   '/knowledge/$slug': typeof AuthenticatedKnowledgeSlugRoute
   '/knowledge/new': typeof AuthenticatedKnowledgeNewRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/activity': typeof AuthenticatedSettingsActivityRoute
+  '/settings/export': typeof AuthenticatedSettingsExportRoute
+  '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/settings/privacy': typeof AuthenticatedSettingsPrivacyRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/experts': typeof AuthenticatedExpertsIndexRoute
   '/knowledge': typeof AuthenticatedKnowledgeIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
+  '/experts/$id/lens': typeof AuthenticatedExpertsIdLensRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/legal': typeof LegalRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/community': typeof AuthenticatedCommunityRoute
+  '/_authenticated/compass': typeof AuthenticatedCompassRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/experts': typeof AuthenticatedExpertsRouteWithChildren
   '/_authenticated/knowledge': typeof AuthenticatedKnowledgeRouteWithChildren
   '/_authenticated/marketplace': typeof AuthenticatedMarketplaceRoute
+  '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteWithChildren
+  '/_authenticated/wallet': typeof AuthenticatedWalletRoute
+  '/legal/cookies': typeof LegalCookiesRoute
+  '/legal/privacy': typeof LegalPrivacyRoute
+  '/legal/terms': typeof LegalTermsRoute
+  '/u/$handle': typeof UHandleRoute
   '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/_authenticated/admin/content': typeof AuthenticatedAdminContentRoute
+  '/_authenticated/admin/experts': typeof AuthenticatedAdminExpertsRoute
+  '/_authenticated/admin/rewards': typeof AuthenticatedAdminRewardsRoute
   '/_authenticated/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
-  '/_authenticated/experts/$id': typeof AuthenticatedExpertsIdRoute
+  '/_authenticated/experts/$id': typeof AuthenticatedExpertsIdRouteWithChildren
+  '/_authenticated/experts/apply': typeof AuthenticatedExpertsApplyRoute
+  '/_authenticated/experts/lens': typeof AuthenticatedExpertsLensRoute
   '/_authenticated/knowledge/$slug': typeof AuthenticatedKnowledgeSlugRoute
   '/_authenticated/knowledge/new': typeof AuthenticatedKnowledgeNewRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/activity': typeof AuthenticatedSettingsActivityRoute
+  '/_authenticated/settings/export': typeof AuthenticatedSettingsExportRoute
+  '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/_authenticated/settings/privacy': typeof AuthenticatedSettingsPrivacyRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/experts/': typeof AuthenticatedExpertsIndexRoute
   '/_authenticated/knowledge/': typeof AuthenticatedKnowledgeIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
+  '/_authenticated/experts/$id/lens': typeof AuthenticatedExpertsIdLensRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/legal'
+    | '/sitemap.xml'
     | '/admin'
     | '/community'
+    | '/compass'
     | '/dashboard'
     | '/experts'
     | '/knowledge'
     | '/marketplace'
+    | '/onboarding'
     | '/settings'
+    | '/wallet'
+    | '/legal/cookies'
+    | '/legal/privacy'
+    | '/legal/terms'
+    | '/u/$handle'
     | '/admin/activity'
+    | '/admin/content'
+    | '/admin/experts'
+    | '/admin/rewards'
     | '/admin/setup'
     | '/admin/users'
     | '/experts/$id'
+    | '/experts/apply'
+    | '/experts/lens'
     | '/knowledge/$slug'
     | '/knowledge/new'
     | '/settings/account'
     | '/settings/activity'
+    | '/settings/export'
+    | '/settings/notifications'
+    | '/settings/privacy'
     | '/admin/'
     | '/experts/'
     | '/knowledge/'
     | '/settings/'
+    | '/experts/$id/lens'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/legal'
+    | '/sitemap.xml'
     | '/community'
+    | '/compass'
     | '/dashboard'
     | '/marketplace'
+    | '/onboarding'
+    | '/wallet'
+    | '/legal/cookies'
+    | '/legal/privacy'
+    | '/legal/terms'
+    | '/u/$handle'
     | '/admin/activity'
+    | '/admin/content'
+    | '/admin/experts'
+    | '/admin/rewards'
     | '/admin/setup'
     | '/admin/users'
     | '/experts/$id'
+    | '/experts/apply'
+    | '/experts/lens'
     | '/knowledge/$slug'
     | '/knowledge/new'
     | '/settings/account'
     | '/settings/activity'
+    | '/settings/export'
+    | '/settings/notifications'
+    | '/settings/privacy'
     | '/admin'
     | '/experts'
     | '/knowledge'
     | '/settings'
+    | '/experts/$id/lens'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/legal'
+    | '/sitemap.xml'
     | '/_authenticated/admin'
     | '/_authenticated/community'
+    | '/_authenticated/compass'
     | '/_authenticated/dashboard'
     | '/_authenticated/experts'
     | '/_authenticated/knowledge'
     | '/_authenticated/marketplace'
+    | '/_authenticated/onboarding'
     | '/_authenticated/settings'
+    | '/_authenticated/wallet'
+    | '/legal/cookies'
+    | '/legal/privacy'
+    | '/legal/terms'
+    | '/u/$handle'
     | '/_authenticated/admin/activity'
+    | '/_authenticated/admin/content'
+    | '/_authenticated/admin/experts'
+    | '/_authenticated/admin/rewards'
     | '/_authenticated/admin/setup'
     | '/_authenticated/admin/users'
     | '/_authenticated/experts/$id'
+    | '/_authenticated/experts/apply'
+    | '/_authenticated/experts/lens'
     | '/_authenticated/knowledge/$slug'
     | '/_authenticated/knowledge/new'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/activity'
+    | '/_authenticated/settings/export'
+    | '/_authenticated/settings/notifications'
+    | '/_authenticated/settings/privacy'
     | '/_authenticated/admin/'
     | '/_authenticated/experts/'
     | '/_authenticated/knowledge/'
     | '/_authenticated/settings/'
+    | '/_authenticated/experts/$id/lens'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  LegalRoute: typeof LegalRouteWithChildren
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  UHandleRoute: typeof UHandleRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal': {
+      id: '/legal'
+      path: '/legal'
+      fullPath: '/legal'
+      preLoaderRoute: typeof LegalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -316,11 +558,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/u/$handle': {
+      id: '/u/$handle'
+      path: '/u/$handle'
+      fullPath: '/u/$handle'
+      preLoaderRoute: typeof UHandleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/terms': {
+      id: '/legal/terms'
+      path: '/terms'
+      fullPath: '/legal/terms'
+      preLoaderRoute: typeof LegalTermsRouteImport
+      parentRoute: typeof LegalRoute
+    }
+    '/legal/privacy': {
+      id: '/legal/privacy'
+      path: '/privacy'
+      fullPath: '/legal/privacy'
+      preLoaderRoute: typeof LegalPrivacyRouteImport
+      parentRoute: typeof LegalRoute
+    }
+    '/legal/cookies': {
+      id: '/legal/cookies'
+      path: '/cookies'
+      fullPath: '/legal/cookies'
+      preLoaderRoute: typeof LegalCookiesRouteImport
+      parentRoute: typeof LegalRoute
+    }
+    '/_authenticated/wallet': {
+      id: '/_authenticated/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof AuthenticatedWalletRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/marketplace': {
@@ -349,6 +633,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/compass': {
+      id: '/_authenticated/compass'
+      path: '/compass'
+      fullPath: '/compass'
+      preLoaderRoute: typeof AuthenticatedCompassRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/community': {
@@ -393,6 +684,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/settings/privacy': {
+      id: '/_authenticated/settings/privacy'
+      path: '/privacy'
+      fullPath: '/settings/privacy'
+      preLoaderRoute: typeof AuthenticatedSettingsPrivacyRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/notifications': {
+      id: '/_authenticated/settings/notifications'
+      path: '/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof AuthenticatedSettingsNotificationsRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
+    '/_authenticated/settings/export': {
+      id: '/_authenticated/settings/export'
+      path: '/export'
+      fullPath: '/settings/export'
+      preLoaderRoute: typeof AuthenticatedSettingsExportRouteImport
+      parentRoute: typeof AuthenticatedSettingsRoute
+    }
     '/_authenticated/settings/activity': {
       id: '/_authenticated/settings/activity'
       path: '/activity'
@@ -421,6 +733,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedKnowledgeSlugRouteImport
       parentRoute: typeof AuthenticatedKnowledgeRoute
     }
+    '/_authenticated/experts/lens': {
+      id: '/_authenticated/experts/lens'
+      path: '/lens'
+      fullPath: '/experts/lens'
+      preLoaderRoute: typeof AuthenticatedExpertsLensRouteImport
+      parentRoute: typeof AuthenticatedExpertsRoute
+    }
+    '/_authenticated/experts/apply': {
+      id: '/_authenticated/experts/apply'
+      path: '/apply'
+      fullPath: '/experts/apply'
+      preLoaderRoute: typeof AuthenticatedExpertsApplyRouteImport
+      parentRoute: typeof AuthenticatedExpertsRoute
+    }
     '/_authenticated/experts/$id': {
       id: '/_authenticated/experts/$id'
       path: '/$id'
@@ -442,6 +768,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSetupRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/rewards': {
+      id: '/_authenticated/admin/rewards'
+      path: '/rewards'
+      fullPath: '/admin/rewards'
+      preLoaderRoute: typeof AuthenticatedAdminRewardsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/experts': {
+      id: '/_authenticated/admin/experts'
+      path: '/experts'
+      fullPath: '/admin/experts'
+      preLoaderRoute: typeof AuthenticatedAdminExpertsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/content': {
+      id: '/_authenticated/admin/content'
+      path: '/content'
+      fullPath: '/admin/content'
+      preLoaderRoute: typeof AuthenticatedAdminContentRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/activity': {
       id: '/_authenticated/admin/activity'
       path: '/activity'
@@ -449,11 +796,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminActivityRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/experts/$id/lens': {
+      id: '/_authenticated/experts/$id/lens'
+      path: '/lens'
+      fullPath: '/experts/$id/lens'
+      preLoaderRoute: typeof AuthenticatedExpertsIdLensRouteImport
+      parentRoute: typeof AuthenticatedExpertsIdRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
+  AuthenticatedAdminContentRoute: typeof AuthenticatedAdminContentRoute
+  AuthenticatedAdminExpertsRoute: typeof AuthenticatedAdminExpertsRoute
+  AuthenticatedAdminRewardsRoute: typeof AuthenticatedAdminRewardsRoute
   AuthenticatedAdminSetupRoute: typeof AuthenticatedAdminSetupRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -461,6 +818,9 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminActivityRoute: AuthenticatedAdminActivityRoute,
+  AuthenticatedAdminContentRoute: AuthenticatedAdminContentRoute,
+  AuthenticatedAdminExpertsRoute: AuthenticatedAdminExpertsRoute,
+  AuthenticatedAdminRewardsRoute: AuthenticatedAdminRewardsRoute,
   AuthenticatedAdminSetupRoute: AuthenticatedAdminSetupRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
@@ -469,13 +829,31 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedExpertsIdRouteChildren {
+  AuthenticatedExpertsIdLensRoute: typeof AuthenticatedExpertsIdLensRoute
+}
+
+const AuthenticatedExpertsIdRouteChildren: AuthenticatedExpertsIdRouteChildren =
+  {
+    AuthenticatedExpertsIdLensRoute: AuthenticatedExpertsIdLensRoute,
+  }
+
+const AuthenticatedExpertsIdRouteWithChildren =
+  AuthenticatedExpertsIdRoute._addFileChildren(
+    AuthenticatedExpertsIdRouteChildren,
+  )
+
 interface AuthenticatedExpertsRouteChildren {
-  AuthenticatedExpertsIdRoute: typeof AuthenticatedExpertsIdRoute
+  AuthenticatedExpertsIdRoute: typeof AuthenticatedExpertsIdRouteWithChildren
+  AuthenticatedExpertsApplyRoute: typeof AuthenticatedExpertsApplyRoute
+  AuthenticatedExpertsLensRoute: typeof AuthenticatedExpertsLensRoute
   AuthenticatedExpertsIndexRoute: typeof AuthenticatedExpertsIndexRoute
 }
 
 const AuthenticatedExpertsRouteChildren: AuthenticatedExpertsRouteChildren = {
-  AuthenticatedExpertsIdRoute: AuthenticatedExpertsIdRoute,
+  AuthenticatedExpertsIdRoute: AuthenticatedExpertsIdRouteWithChildren,
+  AuthenticatedExpertsApplyRoute: AuthenticatedExpertsApplyRoute,
+  AuthenticatedExpertsLensRoute: AuthenticatedExpertsLensRoute,
   AuthenticatedExpertsIndexRoute: AuthenticatedExpertsIndexRoute,
 }
 
@@ -503,12 +881,19 @@ const AuthenticatedKnowledgeRouteWithChildren =
 interface AuthenticatedSettingsRouteChildren {
   AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
   AuthenticatedSettingsActivityRoute: typeof AuthenticatedSettingsActivityRoute
+  AuthenticatedSettingsExportRoute: typeof AuthenticatedSettingsExportRoute
+  AuthenticatedSettingsNotificationsRoute: typeof AuthenticatedSettingsNotificationsRoute
+  AuthenticatedSettingsPrivacyRoute: typeof AuthenticatedSettingsPrivacyRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
 }
 
 const AuthenticatedSettingsRouteChildren: AuthenticatedSettingsRouteChildren = {
   AuthenticatedSettingsAccountRoute: AuthenticatedSettingsAccountRoute,
   AuthenticatedSettingsActivityRoute: AuthenticatedSettingsActivityRoute,
+  AuthenticatedSettingsExportRoute: AuthenticatedSettingsExportRoute,
+  AuthenticatedSettingsNotificationsRoute:
+    AuthenticatedSettingsNotificationsRoute,
+  AuthenticatedSettingsPrivacyRoute: AuthenticatedSettingsPrivacyRoute,
   AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
 }
 
@@ -520,31 +905,64 @@ const AuthenticatedSettingsRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
+  AuthenticatedCompassRoute: typeof AuthenticatedCompassRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExpertsRoute: typeof AuthenticatedExpertsRouteWithChildren
   AuthenticatedKnowledgeRoute: typeof AuthenticatedKnowledgeRouteWithChildren
   AuthenticatedMarketplaceRoute: typeof AuthenticatedMarketplaceRoute
+  AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRouteWithChildren
+  AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
+  AuthenticatedCompassRoute: AuthenticatedCompassRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExpertsRoute: AuthenticatedExpertsRouteWithChildren,
   AuthenticatedKnowledgeRoute: AuthenticatedKnowledgeRouteWithChildren,
   AuthenticatedMarketplaceRoute: AuthenticatedMarketplaceRoute,
+  AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRouteWithChildren,
+  AuthenticatedWalletRoute: AuthenticatedWalletRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface LegalRouteChildren {
+  LegalCookiesRoute: typeof LegalCookiesRoute
+  LegalPrivacyRoute: typeof LegalPrivacyRoute
+  LegalTermsRoute: typeof LegalTermsRoute
+}
+
+const LegalRouteChildren: LegalRouteChildren = {
+  LegalCookiesRoute: LegalCookiesRoute,
+  LegalPrivacyRoute: LegalPrivacyRoute,
+  LegalTermsRoute: LegalTermsRoute,
+}
+
+const LegalRouteWithChildren = LegalRoute._addFileChildren(LegalRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  LegalRoute: LegalRouteWithChildren,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  UHandleRoute: UHandleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

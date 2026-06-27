@@ -8,6 +8,9 @@ import { CoverImage } from "@/components/CoverImage";
 import { MarkdownView } from "@/components/MarkdownView";
 import { useI18n } from "@/lib/i18n";
 import { getArticleBySlug, type KnowledgeArticle } from "@/lib/knowledge";
+import { ArticleComments } from "@/components/ArticleComments";
+import { logActivity } from "@/lib/activity";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/knowledge/$slug")({
   component: ArticleReader,
@@ -32,6 +35,7 @@ export const Route = createFileRoute("/_authenticated/knowledge/$slug")({
 function ArticleReader() {
   const { slug } = Route.useParams();
   const { locale } = useI18n();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [article, setArticle] = useState<KnowledgeArticle | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,12 +51,36 @@ function ArticleReader() {
           return;
         }
         setArticle(a);
+        if (user) void logActivity("article_view", { entityType: "article", entityId: a.id, metadata: { slug } });
       })
       .finally(() => alive && setLoading(false));
     return () => {
       alive = false;
     };
-  }, [slug, navigate]);
+  }, [slug, navigate, user]);
+
+  useEffect(() => {
+    if (!article) return;
+    const articleTitle = locale === "th" && article.title_th ? article.title_th : article.title_en;
+    const excerpt =
+      locale === "th" && article.excerpt_th ? article.excerpt_th : article.excerpt_en;
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: articleTitle,
+      description: excerpt,
+      author: { "@type": "Person", name: article.author_name },
+      datePublished: article.published_at,
+      keywords: article.tags.join(", "),
+    };
+    const el = document.createElement("script");
+    el.type = "application/ld+json";
+    el.textContent = JSON.stringify(jsonLd);
+    document.head.appendChild(el);
+    return () => {
+      el.remove();
+    };
+  }, [article, locale]);
 
   const title = article
     ? locale === "th" && article.title_th
@@ -152,6 +180,8 @@ function ArticleReader() {
                 </p>
               )}
             </div>
+
+            <ArticleComments articleId={article.id} />
           </article>
         )}
       </main>

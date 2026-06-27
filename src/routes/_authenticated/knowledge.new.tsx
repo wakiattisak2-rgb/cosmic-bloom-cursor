@@ -16,6 +16,9 @@ import {
   type Framework,
   type Level,
 } from "@/lib/knowledge";
+import { logActivity } from "@/lib/activity";
+import { canPerformActions, memberRequiredMessage } from "@/lib/member";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/knowledge/new")({
   component: NewArticle,
@@ -29,6 +32,7 @@ const MAX_BYTES = 2 * 1024 * 1024;
 
 function NewArticle() {
   const { t, locale } = useI18n();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [tab, setTab] = useState<"en" | "th">("en");
@@ -81,6 +85,11 @@ function NewArticle() {
     }
     setSaving(true);
     try {
+      if (!canPerformActions(user)) {
+        setError(memberRequiredMessage(locale));
+        setSaving(false);
+        return;
+      }
       let coverPath: string | null = null;
       if (coverFile) coverPath = await uploadCover(coverFile);
 
@@ -104,8 +113,15 @@ function NewArticle() {
         tags: tagList,
         cover_url: coverPath,
         author_name: author.trim() || (locale === "th" ? "ผู้ร่วมเขียน" : "Contributor"),
+        author_id: user!.id,
         read_minutes: readMin,
         is_published: true,
+      });
+
+      await logActivity("article_publish", {
+        entityType: "article",
+        entityId: article.id,
+        metadata: { slug: article.slug },
       });
 
       navigate({ to: "/knowledge/$slug", params: { slug: article.slug } });

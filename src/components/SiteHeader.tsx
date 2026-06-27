@@ -27,11 +27,15 @@ export function SiteHeader() {
             <Sparkles className="h-4 w-4 text-primary" />
           </span>
           <span className="font-display text-lg font-semibold tracking-tight">Aetros</span>
+          <span className="hidden rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest text-primary sm:inline">
+            {locale === "th" ? "ฟรีช่วง Beta" : "Free during Beta"}
+          </span>
         </Link>
 
         <nav className="ml-6 hidden items-center gap-1 md:flex">
           <NavLink to="/" label={t("nav.home")} />
           <NavLink to="/dashboard" label={t("nav.dashboard")} />
+          <NavLink to="/wallet" label={t("nav.wallet")} />
           <NavLink to="/knowledge" label={t("nav.knowledge")} />
           <NavLink to="/experts" label={t("nav.experts")} />
           <NavLink to="/community" label={t("nav.community")} />
@@ -83,16 +87,19 @@ export function SiteHeader() {
               <LogOut className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">{t("nav.signout")}</span>
             </button>
-          ) : (
+          ) : isAnon ? (
             <Link
               to="/auth"
               className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground shadow-[0_0_20px_rgba(0,255,102,0.45)] transition-transform hover:scale-[1.03]"
             >
-              {isAnon
-                ? locale === "th"
-                  ? "บันทึกบัญชี"
-                  : "Save account"
-                : t("nav.signin")}
+              {locale === "th" ? "บันทึกบัญชี" : "Save account"}
+            </Link>
+          ) : (
+            <Link
+              to="/dashboard"
+              className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground shadow-[0_0_20px_rgba(0,255,102,0.45)] transition-transform hover:scale-[1.03]"
+            >
+              {t("hero.cta")}
             </Link>
           )}
         </div>

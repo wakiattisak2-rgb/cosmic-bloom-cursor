@@ -1,30 +1,37 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { toast } from "sonner";
-import { Car, Recycle, Sprout, Zap, Sparkles, RotateCcw, Rocket } from "lucide-react";
+import { Car, Recycle, Sprout, Zap, Sparkles, Compass, Wallet } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { EcoAvatar } from "@/components/EcoAvatar";
+import { ImpactConstellation } from "@/components/ImpactConstellation";
+import { ImpactReceiptModal } from "@/components/ImpactReceiptModal";
+import { type ReceiptData } from "@/components/ImpactReceiptCard";
 import { TierBadge, TierProgress } from "@/components/TierBadge";
 import { ImpactCounter } from "@/components/ImpactCounter";
 import { Starfield } from "@/components/Starfield";
 import { BurstLayer, type Burst } from "@/components/ParticleBurst";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { logActivity } from "@/lib/activity";
+import { computeStreak, weeklyActionSummary } from "@/lib/streak";
 import { useI18n } from "@/lib/i18n";
+import type { ActionLogRow } from "@/lib/constellation";
+import { ECO_ACTIONS, getEcoAction } from "@/lib/eco-actions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Aetros" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    log: typeof s.log === "string" ? s.log : undefined,
+  }),
   component: Dashboard,
 });
 
-const ACTIONS = [
-  { type: "ev_commute", emoji: "🚗", labelKey: "dash.act.ev", icon: Car, xp: 50, credits: 10 },
-  { type: "recycle", emoji: "♻️", labelKey: "dash.act.recycle", icon: Recycle, xp: 30, credits: 5 },
-  { type: "tree_plant", emoji: "🌱", labelKey: "dash.act.tree", icon: Sprout, xp: 100, credits: 20 },
-  { type: "energy", emoji: "⚡", labelKey: "dash.act.energy", icon: Zap, xp: 20, credits: 3 },
-] as const;
+const ACTIONS = ECO_ACTIONS.map((a) => ({
+  ...a,
+  icon: { ev_commute: Car, recycle: Recycle, tree_plant: Sprout, energy: Zap }[a.type],
+}));
 
 type Action = (typeof ACTIONS)[number];
 
@@ -39,11 +46,15 @@ function relTime(iso: string, locale: "en" | "th") {
 
 function Dashboard() {
   const { user } = useAuth();
-  const { t, locale } = useI18n();
+  const { t, locale, tx } = useI18n();
+  const navigate = useNavigate();
+  const { log: logFromCompass } = Route.useSearch();
   const qc = useQueryClient();
   const [bursts, setBursts] = useState<Burst[]>([]);
-  const [simBoost, setSimBoost] = useState(0);
+  const [receiptOpen, setReceiptOpen] = useState(false);
+  const [lastReceipt, setLastReceipt] = useState<ReceiptData | null>(null);
   const burstId = useRef(0);
+  const consumedLogRef = useRef<string | null>(null);
 
   const profile = useQuery({
     queryKey: ["profile", user?.id],
@@ -56,6 +67,21 @@ function Dashboard() {
         .maybeSingle();
       if (error) throw error;
       return data;
+    },
+  });
+
+  const constellationActions = useQuery({
+    queryKey: ["constellation-actions", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("actions_log")
+        .select("id, action_type, xp_awarded, credits_awarded, created_at")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return (data ?? []) as ActionLogRow[];
     },
   });
 
@@ -84,6 +110,7 @@ function Dashboard() {
         { event: "INSERT", schema: "public", table: "actions_log", filter: `user_id=eq.${user.id}` },
         () => {
           qc.invalidateQueries({ queryKey: ["actions", user.id] });
+          qc.invalidateQueries({ queryKey: ["constellation-actions", user.id] });
           qc.invalidateQueries({ queryKey: ["profile", user.id] });
         },
       )
@@ -95,14 +122,25 @@ function Dashboard() {
 
   const logMut = useMutation({
     mutationFn: async (a: Action) => {
-      const { error } = await supabase.rpc("log_action", {
+      const { data: row, error } = await supabase.rpc("log_action", {
         p_action_type: a.type,
         p_xp: a.xp,
         p_credits: a.credits,
         p_note: undefined,
       });
       if (error) throw error;
-      return a;
+
+      let receipt: ReceiptData | null = null;
+      try {
+        const { data: r } = await (supabase.from as any)("impact_receipts")
+          .select("*")
+          .eq("action_log_id", (row as { id: string }).id)
+          .maybeSingle();
+        if (r) receipt = r as ReceiptData;
+      } catch {
+        /* migration may not be applied yet */
+      }
+      return { action: a, receipt };
     },
     onMutate: async (a) => {
       await qc.cancelQueries({ queryKey: ["profile", user?.id] });
@@ -120,12 +158,37 @@ function Dashboard() {
       if (ctx?.prev) qc.setQueryData(["profile", user?.id], ctx.prev);
       toast.error(e.message ?? "Failed");
     },
-    onSuccess: () => {
+    onSuccess: ({ action: a, receipt }) => {
+      void logActivity("eco_action", {
+        entityType: "action",
+        metadata: { action_type: a.type, xp: a.xp, credits: a.credits },
+      });
       qc.invalidateQueries({ queryKey: ["actions", user?.id] });
+      qc.invalidateQueries({ queryKey: ["constellation-actions", user?.id] });
       qc.invalidateQueries({ queryKey: ["profile", user?.id] });
       qc.invalidateQueries({ queryKey: ["impact"] });
+      qc.invalidateQueries({ queryKey: ["receipts", user?.id] });
+      if (receipt) {
+        setLastReceipt(receipt);
+        setReceiptOpen(true);
+      }
     },
   });
+
+  useEffect(() => {
+    if (!logFromCompass || !user) return;
+    if (consumedLogRef.current === logFromCompass) return;
+    consumedLogRef.current = logFromCompass;
+    navigate({ to: "/dashboard", search: {}, replace: true });
+
+    const def = getEcoAction(logFromCompass);
+    if (!def) return;
+    const action = ACTIONS.find((a) => a.type === def.type);
+    if (action) {
+      logMut.mutate(action);
+      toast.success(tx("Logged from Compass", "บันทึกจาก Compass แล้ว"));
+    }
+  }, [logFromCompass, user, navigate, logMut, tx]);
 
   const fireBurst = (e: MouseEvent, a: Action) => {
     const id = ++burstId.current;
@@ -138,8 +201,10 @@ function Dashboard() {
   };
 
   const trueXp = profile.data?.xp ?? 0;
-  const xp = trueXp + simBoost;
+  const xp = trueXp;
   const credits = profile.data?.carbon_credits ?? 0;
+  const streak = computeStreak(recent.data ?? []);
+  const week = weeklyActionSummary(recent.data ?? []);
 
   return (
     <div className="min-h-screen">
@@ -175,43 +240,68 @@ function Dashboard() {
               </div>
             </header>
 
-            {/* Action Tracker */}
+            <div className="grid gap-3 sm:grid-cols-2 animate-fade-up" style={{ animationDelay: "40ms" }}>
+              <Link
+                to="/compass"
+                className="glass group flex items-center gap-3 rounded-xl border border-primary/20 p-4 transition-all hover:border-primary/50 hover:shadow-[0_0_24px_rgba(0,255,102,0.15)]"
+              >
+                <Compass className="h-5 w-5 text-primary" />
+                <div>
+                  <p className="text-sm font-medium">{tx("Find your ESG focus", "หาโฟกus ESG ของคุณ")}</p>
+                  <p className="text-[11px] text-muted-foreground">{tx("ESG focus wizard", "เข็มทิศ ESG")}</p>
+                </div>
+              </Link>
+              <Link
+                to="/wallet"
+                className="glass group flex items-center gap-3 rounded-xl border border-primary/20 p-4 transition-all hover:border-primary/50"
+              >
+                <Wallet className="h-5 w-5 text-aurora" />
+                <div>
+                  <p className="text-sm font-medium">{tx("Impact Wallet", "กระเป๋า Impact")}</p>
+                  <p className="text-[11px] text-muted-foreground">{tx("Verified receipts", "ใบเสร็จยืนยัน")}</p>
+                </div>
+              </Link>
+              <div className="glass rounded-xl p-4">
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  {locale === "th" ? "สตรีครายวัน" : "Daily streak"}
+                </p>
+                <p className="mt-1 font-display text-3xl text-aurora">
+                  {streak} {locale === "th" ? "วัน" : "days"}
+                </p>
+              </div>
+              <div className="glass rounded-xl p-4">
+                <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  {locale === "th" ? "สรุป 7 วัน" : "Weekly summary"}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {week.count} {locale === "th" ? "การกระทำ" : "actions"} · +{week.xp} XP · +{week.credits} CC
+                </p>
+              </div>
+            </div>
+
+            {/* Action Tracker — secondary */}
             <section className="animate-fade-up" style={{ animationDelay: "80ms" }}>
-              <h2 className="mb-3 flex items-center gap-2 font-display text-lg">
+              <h2 className="mb-3 flex items-center gap-2 font-display text-base text-muted-foreground">
                 <Sparkles className="h-4 w-4 text-primary" />
                 {t("dash.log")}
               </h2>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {ACTIONS.map((a) => {
-                  const Icon = a.icon;
-                  return (
-                    <button
-                      key={a.type}
-                      disabled={logMut.isPending}
-                      onClick={(e) => onLog(e, a)}
-                      className="glass group relative flex items-center gap-4 overflow-hidden rounded-xl border border-border p-4 text-left transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[0_8px_32px_rgba(0,255,102,0.25)] disabled:opacity-60"
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {ACTIONS.map((a) => (
+                  <button
+                    key={a.type}
+                    disabled={logMut.isPending}
+                    onClick={(e) => onLog(e, a)}
+                      className="glass group relative flex flex-col items-center gap-2 overflow-hidden rounded-xl border border-border p-3 text-center transition-all hover:-translate-y-0.5 hover:border-primary/60 disabled:opacity-60"
                     >
-                      <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-primary/10 text-2xl ring-1 ring-primary/30 transition-transform group-hover:scale-110">
+                      <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-xl ring-1 ring-primary/30">
                         <span>{a.emoji}</span>
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium">{t(a.labelKey as any)}</div>
-                        <div className="mt-1 font-mono text-[10px] uppercase tracking-wider text-aurora">
-                          +{a.xp} XP · +{a.credits} CC
-                        </div>
+                      <div className="text-[11px] font-medium leading-tight">{t(a.labelKey as any)}</div>
+                      <div className="font-mono text-[9px] uppercase tracking-wider text-aurora">
+                        +{a.xp} XP
                       </div>
-                      <Icon className="h-4 w-4 text-primary/60 transition-colors group-hover:text-primary" />
-                      <span
-                        aria-hidden
-                        className="pointer-events-none absolute -inset-px rounded-xl opacity-0 transition-opacity group-hover:opacity-100"
-                        style={{
-                          background:
-                            "radial-gradient(400px circle at var(--x,50%) var(--y,50%), rgba(0,255,102,0.12), transparent 40%)",
-                        }}
-                      />
                     </button>
-                  );
-                })}
+                ))}
               </div>
             </section>
 
@@ -257,32 +347,14 @@ function Dashboard() {
             </section>
           </section>
 
-          {/* Avatar column */}
-          <aside className="space-y-4">
-            <div className="glass glow-border flex flex-col items-center rounded-2xl p-6 animate-fade-up" style={{ animationDelay: "40ms" }}>
-              <h3 className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">
-                Inner Universe
+          {/* Constellation hero */}
+          <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+            <div className="glass glow-border rounded-2xl p-4 animate-fade-up" style={{ animationDelay: "40ms" }}>
+              <h3 className="mb-3 text-xs uppercase tracking-widest text-muted-foreground">
+                {tx("Impact Constellation", "กลุ่มดาว Impact")}
               </h3>
-              <EcoAvatar xp={xp} size={280} />
-              <div className="mt-4 flex w-full gap-2">
-                <button
-                  onClick={() => setSimBoost((s) => s + 250)}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary/40 bg-primary/10 px-3 py-2 text-xs font-mono uppercase tracking-widest text-primary transition-all hover:bg-primary/20 hover:shadow-[0_0_16px_rgba(0,255,102,0.4)]"
-                >
-                  <Rocket className="h-3.5 w-3.5" />
-                  {t("dash.simulate")}
-                </button>
-                {simBoost > 0 && (
-                  <button
-                    onClick={() => setSimBoost(0)}
-                    className="flex items-center justify-center gap-1 rounded-lg border border-border bg-muted/40 px-3 py-2 text-xs font-mono uppercase tracking-widest text-muted-foreground transition-all hover:text-foreground"
-                  >
-                    <RotateCcw className="h-3.5 w-3.5" />
-                    {t("dash.reset_sim")}
-                  </button>
-                )}
-              </div>
-              <div className="mt-6 grid w-full grid-cols-2 gap-3 text-center">
+              <ImpactConstellation actions={constellationActions.data ?? []} width={340} height={340} />
+              <div className="mt-4 grid grid-cols-2 gap-3 text-center">
                 <div>
                   <div className="font-display text-2xl text-aurora">
                     <ImpactCounter value={credits} />
@@ -309,6 +381,7 @@ function Dashboard() {
         bursts={bursts}
         onDone={(id) => setBursts((b) => b.filter((x) => x.id !== id))}
       />
+      <ImpactReceiptModal receipt={lastReceipt} open={receiptOpen} onClose={() => setReceiptOpen(false)} />
     </div>
   );
 }
